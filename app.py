@@ -6,7 +6,6 @@
 #mark: load corpus txt
 
 #mark: load stopword
-from sklearn.svm import LinearSVC
 import Utils
 import pickle
 import time
