@@ -14,7 +14,7 @@ import pandas as pd
 
 def multinomialNB():
     model = MultinomialNB(alpha=0.1)
-    model.fit(X_train, y_train)
+    model.fit(X_train, Y_train)
 
     predictions = model.predict(X_test)
     aucscore = roc_auc_score(y_test, predictions)
@@ -35,7 +35,7 @@ def multinomialNB():
 
 def bernoulliNB():
     model = BernoulliNB(alpha=1e-10)
-    model.fit(X_train, y_train)
+    model.fit(X_train, Y_train)
 
     predictions = model.predict(X_test)
     aucscore = roc_auc_score(y_test, predictions)
@@ -56,7 +56,7 @@ def bernoulliNB():
 
 def svm():
     model = LinearSVC()
-    model.fit(X_train, y_train)
+    model.fit(X_train, Y_train)
 
     predictions = model.predict(X_test)
     aucscore = roc_auc_score(y_test, predictions)
@@ -89,66 +89,64 @@ if __name__ == '__main__':
     # with open("bagword.json", "w") as outfile:
     #     json.dump(bag_word, outfile)
 
-    X_train, X_test, y_train, y_test = train_test_split(vectors, labels, random_state=0)
+    X_train, X_test, Y_train, Y_test = train_test_split(vectors, labels, random_state=0)
 
-    print("\nStart train using MultinomialNB")
-    multinomialNB()
-    print("\nStart train using BernoulliNB")
-    bernoulliNB()
-    print("\nStart train using SVM")
-    svm()
+    # print("\nStart train using MultinomialNB")
+    # multinomialNB()
+    # print("\nStart train using BernoulliNB")
+    # bernoulliNB()
+    # print("\nStart train using SVM")
+    # svm()
 
-    
-    # # train model using naive bayes
+    # train model using naive bayes
     # clf1 = BernoulliNB(alpha=1e-10)
     # clf1.fit(vectors, labels)
-    #
-    # # train model using svm
-    # svm = LinearSVC()
-    # svm.fit(vectors, labels)
-    #
-    # # create coreML model
-    # # svmModel = coremltools.converters.sklearn.convert(svm, "message", 'label')
-    # # svmModel.author = 'Thanh Quang'
-    # # svmModel.short_description = "Classify whether message is spam or not"
-    # # svmModel.input_description["message"] = "vector of message to be classified"
-    # # svmModel.output_description["spam_or_not"] = "Whether message is spam or not"
-    # # svmModel.save('detect_spam.mlmodel')
-    #
-    # # coreml_model = coremltools.converters.sklearn.convert(clf1)
-    # # coreml_model.author = 'Thanh Quang'
-    # # coreml_model.short_description = "Classify whether message is spam or not"
-    # # coreml_model.input_description["message"] = "vector of message to be classified"
-    # # coreml_model.output_description["spam_or_not"] = "Whether message is spam or not"
-    # # coreml_model.save("detect_spam.mlmodel")
-    #
-    # # test
-    # test_texts = [
-    #     'Cho vay tieu dùng ca nhan,Lai xuat hap hap dan,lien he 099.666.8888',
-    #     'Rảnh không mi, đi học bơi với t nè, chừ luôn',
-    #     'Em đi học về chưa',
-    #     'Gọi ngay, còn duy nhất 20 căn giá rẻ. ĐT xxxxxxx',
-    #     'Ban duoc FE CREDIT ho tro vay den 50 TRIEU VND, tra gop tu 439,000d/thang…',
-    #     'Nếu mà cô quyết định như này thì tối qua anh không để em một mình đâu',
-    #     'Bạn đang làm gì đấy, inbox mình nhờ chút chuyện với nhé',
-    #     'Chương trình khuyến mãi lớn nhất trong năm, giảm giá 50% tất cả các mặt hàng, free quẹt thẻ, 100% mua là trúng'
-    # ]
-    #
-    # y_test = [1, 0, 0, 1, 1, 0, 0, 1]
-    # x_test = [Utils.handleMessage(text, bag_word) for text in test_texts]
-    #
+
+    # train model using svm
+    svm = LinearSVC()
+    svm.fit(vectors, labels)
+
+    # create coreML model
+    svmModel = coremltools.converters.sklearn.convert(svm, 'message', 'label')
+    svmModel.author = 'Thanh Quang'
+    svmModel.short_description = 'Classify whether message is spam or not'
+    svmModel.input_description['message'] = 'vector spam 0 - 1'
+    svmModel.save('detect_spam_svm.mlmodel')
+
+    # coreml_model = coremltools.converters.sklearn.convert(clf1)
+    # coreml_model.author = 'Thanh Quang'
+    # coreml_model.short_description = "Classify whether message is spam or not"
+    # coreml_model.input_description["message"] = "vector of message to be classified"
+    # coreml_model.output_description["spam_or_not"] = "Whether message is spam or not"
+    # coreml_model.save("detect_spam.mlmodel")
+
+    # test
+    test_texts = [
+        'Cho vay tieu dùng ca nhan,Lai xuat hap hap dan,lien he 099.666.8888',
+        'Rảnh không mi, đi học bơi với t nè, chừ luôn',
+        'Em đi học về chưa',
+        'Gọi ngay, còn duy nhất 20 căn giá rẻ. ĐT xxxxxxx',
+        'Ban duoc FE CREDIT ho tro vay den 50 TRIEU VND, tra gop tu 439,000d/thang…',
+        'Nếu mà cô quyết định như này thì tối qua anh không để em một mình đâu',
+        'Bạn đang làm gì đấy, inbox mình nhờ chút chuyện với nhé',
+        'Chương trình khuyến mãi lớn nhất trong năm, giảm giá 50% tất cả các mặt hàng, free quẹt thẻ, 100% mua là trúng'
+    ]
+
+    y_test = [1, 0, 0, 1, 1, 0, 0, 1]
+    x_test = [Utils.handleMessage(text, bag_word) for text in test_texts]
+
     # bernoulliPredictions = clf1.predict(x_test)
-    # svmPredictions = svm.predict(x_test)
-    #
-    # # accuracy
+    svmPredictions = svm.predict(x_test)
+
+    # accuracy
     # print("Bernoulli ex", bernoulliPredictions)
     # print('Bernoulli: Training size = %d, accuracy = %.2f%%' % \
     #       (len(vectors), accuracy_score(y_test, bernoulliPredictions) * 100))
-    #
-    # print("Svm ex", svmPredictions)
-    # print('Svm: Training size = %d, accuracy = %.2f%%' % \
-    #       (len(vectors), accuracy_score(y_test, svmPredictions) * 100))
-    #
+
+    print("Svm ex", svmPredictions)
+    print('Svm: Training size = %d, accuracy = %.2f%%' % \
+          (len(vectors), accuracy_score(y_test, svmPredictions) * 100))
+
     # # confusion matrix
     # tn, fp, fn, tp = confusion_matrix(y_test, bernoulliPredictions).ravel()
     # print(pd.DataFrame(confusion_matrix(y_test, bernoulliPredictions),
