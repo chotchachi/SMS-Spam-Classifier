@@ -86,7 +86,7 @@ if __name__ == '__main__':
     vectors = Utils.convertToVector(corpus, bag_word)
 
     # save bag words
-    # with open("bag_word.json", "w") as outfile:
+    # with open("bagword.json", "w") as outfile:
     #     json.dump(bag_word, outfile)
 
     X_train, X_test, y_train, y_test = train_test_split(vectors, labels, random_state=0)
