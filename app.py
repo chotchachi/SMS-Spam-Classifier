@@ -10,6 +10,8 @@ import Utils
 import json
 import coremltools
 import pandas as pd
+import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def multinomialNB():
@@ -75,6 +77,12 @@ def svm():
     print(f'False Positive Rate: {(fp / (fp + tn))}')
 
 
+def showChart():
+    # show amount of spam & ham messages
+    plt.bar(['ham', 'spam'], [list(labels).count(0), list(labels).count(1)])
+    plt.show()
+
+
 if __name__ == '__main__':
     print(">>>>>>>>>>>>>>>>>>>> START >>>>>>>>>>>>>>>>>>>>")
 
@@ -82,6 +90,7 @@ if __name__ == '__main__':
     labels, content = Utils.loadCorpus('corpus.txt')
     corpus = [Utils.removeSpecialCharacter(d) for d in content]
     labels = Utils.mapLabelToNumber(labels)
+    # showChart()
     bag_word = Utils.exportBagWords(corpus)
     vectors = Utils.convertToVector(corpus, bag_word)
 
@@ -99,19 +108,19 @@ if __name__ == '__main__':
     # svm()
 
     # train model using naive bayes
-    # clf1 = BernoulliNB(alpha=1e-10)
-    # clf1.fit(vectors, labels)
+    clf1 = BernoulliNB(alpha=1e-10)
+    clf1.fit(vectors, labels)
 
     # train model using svm
     svm = LinearSVC()
     svm.fit(vectors, labels)
 
     # create coreML model
-    svmModel = coremltools.converters.sklearn.convert(svm, 'message', 'label')
-    svmModel.author = 'Thanh Quang'
-    svmModel.short_description = 'Classify whether message is spam or not'
-    svmModel.input_description['message'] = 'vector spam 0 - 1'
-    svmModel.save('detect_spam_svm.mlmodel')
+    # svmModel = coremltools.converters.sklearn.convert(svm, 'message', 'label')
+    # svmModel.author = 'Thanh Quang'
+    # svmModel.short_description = 'Classify whether message is spam or not'
+    # svmModel.input_description['message'] = 'vector spam 0 - 1'
+    # svmModel.save('detect_spam_svm.mlmodel')
 
     # coreml_model = coremltools.converters.sklearn.convert(clf1)
     # coreml_model.author = 'Thanh Quang'
@@ -135,13 +144,13 @@ if __name__ == '__main__':
     y_test = [1, 0, 0, 1, 1, 0, 0, 1]
     x_test = [Utils.handleMessage(text, bag_word) for text in test_texts]
 
-    # bernoulliPredictions = clf1.predict(x_test)
+    bernoulliPredictions = clf1.predict(x_test)
     svmPredictions = svm.predict(x_test)
 
     # accuracy
-    # print("Bernoulli ex", bernoulliPredictions)
-    # print('Bernoulli: Training size = %d, accuracy = %.2f%%' % \
-    #       (len(vectors), accuracy_score(y_test, bernoulliPredictions) * 100))
+    print("Bernoulli ex", bernoulliPredictions)
+    print('Bernoulli: Training size = %d, accuracy = %.2f%%' % \
+          (len(vectors), accuracy_score(y_test, bernoulliPredictions) * 100))
 
     print("Svm ex", svmPredictions)
     print('Svm: Training size = %d, accuracy = %.2f%%' % \
@@ -168,10 +177,3 @@ if __name__ == '__main__':
     # Utils.configureBayesMatrix(bag_word, vectors, labels, count_spam, count_non_spam, bayes_matrix)
     # spam = _p_spam
     # not_spam = _p_non_spam
-    #
-    # smvv = [svm.predict([Utils.handleMessage(d, bag_word)])[0] for d in corpus]
-    # preds = [clf1.predict([Utils.handleMessage(d, bag_word)])[0] for d in corpus]
-    # pred = [Utils.predict(d, bag_word, spam, not_spam, bayes_matrix) for d in corpus]
-    # print(accuracy_score(labels, smvv) * 100)
-    # print(accuracy_score(labels, pred) * 100)
-    # print('%', accuracy_score(labels, preds) * 100)
